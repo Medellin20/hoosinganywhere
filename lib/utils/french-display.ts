@@ -1,0 +1,41 @@
+const FRENCH_LABELS = new Map([
+  ["Onbepaalde duur", "Période indéterminée"],
+  ["Bepaalde duur", "Durée déterminée"],
+  ["Tijdelijke verhuur", "Location temporaire"],
+  ["Ongemeubileerd", "Non meublé"],
+  ["Gedeeltelijk gemeubileerd", "Semi-meublé"],
+  ["Gemeubileerd", "Meublé"],
+  ["Uitstekend", "Excellent"],
+  ["Goed", "Bien"],
+  ["Op te frissen", "À rafraîchir"],
+  ["Te renoveren", "À rénover"],
+  ["Bestaand gebouw", "Bâtiment existant"],
+  ["Nieuwbouw", "Construction neuve"],
+  ["Verwarming", "Chauffage"],
+  ["Ingerichte keuken", "Cuisine équipée"],
+  ["Wasmachine", "Machine à laver"],
+  ["Vaatwasser", "Lave-vaisselle"],
+  ["Parkeergelegenheid", "Parking"],
+  ["Balkon", "Balcon"],
+  ["Lift", "Ascenseur"],
+  ["Tuin", "Jardin"],
+  ["Kelder", "Cave"],
+  ["Fietsenberging", "Local à vélos"],
+  ["Airconditioning", "Climatisation"],
+  ["Woning", "Maison"],
+  ["Kamer", "Chambre"],
+  ["Vast contract", "CDI"],
+  ["Contract voor bepaalde tijd", "CDD"],
+  ["Zelfstandig", "Indépendant"],
+  ["Tijdelijk contract", "Intérim"],
+  ["Student", "Étudiant"],
+  ["Anders", "Autre"],
+  ["Demo-bankgegevens: voer geen overschrijving uit voordat deze in de beheeromgeving zijn vervangen.", "RIB de démonstration — ne pas effectuer de virement avant son remplacement dans l’espace administrateur."],
+  ["maison", "Maison"],
+  ["chambre", "Chambre"],
+]);
+
+/** Traduit les anciens libellés connus sans modifier les valeurs enregistrées. */
+export function frenchLabel(value: string): string {
+  return FRENCH_LABELS.get(value) ?? value;
+}

@@ -1,0 +1,17 @@
+# Dépendances et fichiers générés
+node_modules/
+.next/
+out/
+coverage/
+*.tsbuildinfo
+
+# Configuration locale et secrets
+.env
+.env.*
+!.env.example
+.netlify/
+supabase/.temp/
+
+# Journaux et fichiers système
+*.log
+.DS_Store

@@ -1,0 +1,143 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-sand-100 text-ink antialiased;
+    font-feature-settings: 'tnum' on, 'lnum' on;
+    min-height: 100dvh;
+    overflow-x: clip;
+  }
+
+  ::selection {
+    @apply bg-canal-200 text-ink-900;
+  }
+
+  /* Anneau de focus visible et cohérent au clavier partout dans l'app */
+  :focus-visible {
+    @apply outline-none ring-2 ring-ink-700 ring-offset-2 ring-offset-sand-100;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  .container-app {
+    @apply mx-auto w-full max-w-7xl;
+    padding-left: max(1rem, env(safe-area-inset-left));
+    padding-right: max(1rem, env(safe-area-inset-right));
+  }
+
+  @media (min-width: 640px) {
+    .container-app {
+      padding-left: max(1.5rem, env(safe-area-inset-left));
+      padding-right: max(1.5rem, env(safe-area-inset-right));
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .container-app {
+      padding-left: max(2rem, env(safe-area-inset-left));
+      padding-right: max(2rem, env(safe-area-inset-right));
+    }
+  }
+
+  /* Motif "ligne de canal" — signature visuelle utilisée entre les sections */
+  .canal-divider {
+    @apply relative h-px w-full bg-canal-line;
+  }
+  .canal-divider::after {
+    content: '';
+    @apply absolute left-1/2 top-1/2 h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rotate-45 bg-brick-500;
+  }
+}
+
+/* Skeleton shimmer keyframe fallback (au cas où le plugin tailwind ne l'ait pas injecté) */
+@keyframes shimmer {
+  from { background-position: -700px 0; }
+  to { background-position: 700px 0; }
+}
+
+@media print {
+  @page {
+    size: A4;
+    margin: 12mm;
+  }
+
+  html:has(.receipt-page),
+  body:has(.receipt-page) {
+    min-height: 0 !important;
+    height: auto !important;
+    background: #fff !important;
+  }
+
+  body:has(.receipt-page) .public-site-layout {
+    display: block !important;
+    min-height: 0 !important;
+    height: auto !important;
+    background: #fff !important;
+  }
+
+  body:has(.receipt-page) .public-site-layout > :not(main) {
+    display: none !important;
+  }
+
+  body:has(.receipt-page) .public-site-layout > main {
+    display: block !important;
+    min-height: 0 !important;
+    height: auto !important;
+  }
+
+  body:has(.receipt-page) * {
+    visibility: hidden !important;
+  }
+
+  body:has(.receipt-page) .receipt-page,
+  body:has(.receipt-page) .receipt-page * {
+    visibility: visible !important;
+  }
+
+  body:has(.receipt-page) .receipt-page {
+    position: static;
+    width: 100%;
+    max-width: none;
+    padding: 0;
+    background: #fff !important;
+  }
+
+  .receipt-sheet {
+    max-width: none;
+    border: 0;
+    padding: 0;
+    box-shadow: none;
+  }
+
+  .receipt-actions,
+  .no-print {
+    display: none !important;
+  }
+
+  .receipt-section,
+  .receipt-row {
+    break-inside: avoid;
+  }
+
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}

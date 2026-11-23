@@ -1,0 +1,105 @@
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import {
+  Building2,
+  CheckCircle2,
+  Clock,
+  Home,
+  FileText,
+  PlusCircle,
+} from 'lucide-react';
+import { getDashboardStats, getRecentAdminLogs } from '@/lib/data/admin-stats';
+import { StatCard } from '@/components/admin/stat-card';
+import { Button } from '@/components/ui/button';
+import { formatDateTime } from '@/lib/utils/format';
+import type { DashboardStats } from '@/types';
+
+const ADMIN_ACTION_LABELS: Record<string, string> = {
+  'admin.login': 'Connexion à l’administration',
+  'admin.logout': 'Déconnexion de l’administration',
+  'bank_settings.update': 'Coordonnées bancaires mises à jour',
+  'site_settings.update': 'Paramètres du site mis à jour',
+  'property.create': 'Appartement ajouté',
+  'property.update': 'Appartement modifié',
+  'property.delete': 'Appartement supprimé',
+  'property.status_change': 'Statut d’un appartement modifié',
+  'property.images_upload': 'Photos ajoutées à un appartement',
+  'property.publish': 'Appartement publié',
+  'property.unpublish': 'Appartement dépublié',
+  'viewing.status_change': 'Statut d’une visite modifié',
+  'viewing.payment_received': 'Paiement d’une visite reçu',
+  'reservation.status_change': 'Statut d’une réservation modifié',
+  'guarantee.status_change': 'Statut d’une garantie modifié',
+  'refund.status_change': 'Statut d’un remboursement modifié',
+};
+
+export const metadata: Metadata = { title: 'Tableau de bord' };
+export const dynamic = 'force-dynamic';
+
+export default async function AdminDashboardPage() {
+  const [statsResult, logsResult] = await Promise.allSettled([
+    getDashboardStats(),
+    getRecentAdminLogs(),
+  ]);
+
+  const stats: DashboardStats = statsResult.status === 'fulfilled'
+    ? statsResult.value
+    : {
+        totalProperties: 0,
+        availableProperties: 0,
+        reservedProperties: 0,
+        rentedProperties: 0,
+        draftProperties: 0,
+        viewingRequestsTotal: 0,
+        viewingsToday: 0,
+        reservationsPending: 0,
+  };
+  const logs = logsResult.status === 'fulfilled' ? logsResult.value : [];
+  const dataLoadFailed = [statsResult, logsResult].some((result) => result.status === 'rejected');
+
+  return (
+    <div>
+      {dataLoadFailed && (
+        <div role="alert" className="mb-6 rounded-2xl border border-brick-200 bg-brick-50 p-4 text-sm text-brick-700">
+          Certaines données n’ont pas pu être chargées. Vérifiez les variables Supabase du déploiement.
+        </div>
+      )}
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-extrabold text-ink-900">Tableau de bord</h1>
+          <p className="mt-1 text-sm text-ink-500">Vue d’ensemble de l’activité de l’agence.</p>
+        </div>
+        <Link href="/admin/appartements/nouveau" className="w-full sm:w-auto">
+          <Button className="w-full sm:w-auto">
+            <PlusCircle className="h-4 w-4" />
+            Ajouter un bien
+          </Button>
+        </Link>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 min-[380px]:grid-cols-2 sm:grid-cols-3 xl:grid-cols-5">
+        <StatCard href="/admin/appartements" icon={Building2} label="Total des biens" value={stats.totalProperties} />
+        <StatCard href="/admin/appartements?status=available" icon={Home} label="Disponibles" value={stats.availableProperties} tone="positive" />
+        <StatCard href="/admin/appartements?status=reserved" icon={Clock} label="Réservés" value={stats.reservedProperties} tone="warning" />
+        <StatCard href="/admin/appartements?status=rented" icon={CheckCircle2} label="Loués" value={stats.rentedProperties} />
+        <StatCard href="/admin/appartements?status=draft" icon={FileText} label="Brouillons" value={stats.draftProperties} />
+      </div>
+
+      <div className="mt-8 rounded-2xl border border-ink-100 bg-white p-5 sm:p-6">
+        <h2 className="font-bold text-ink-900">Activité récente</h2>
+        {logs.length === 0 ? (
+          <p className="mt-3 text-sm text-ink-400">Aucune action enregistrée pour le moment.</p>
+        ) : (
+          <ul className="mt-4 divide-y divide-ink-100">
+            {logs.map((log) => (
+              <li key={log.id} className="flex flex-col gap-1 py-3 text-sm sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+                <span className="min-w-0 text-ink-700">{ADMIN_ACTION_LABELS[log.action] ?? 'Action administrative'}</span>
+                <span className="shrink-0 text-xs text-ink-400">{formatDateTime(log.created_at)}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </div>
+  );
+}
